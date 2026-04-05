@@ -69,8 +69,9 @@
         .problems-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
         .problem-card{border:1px solid rgba(255,49,49,.28);padding:1.5rem;background:rgba(255,49,49,.03);position:relative;transition:all .3s}
         .problem-card:hover{border-color:var(--r);background:rgba(255,49,49,.07)}
-        .problem-card::before{content:'//';position:absolute;top:1rem;right:1rem;color:rgba(255,49,49,.3);font-size:.78rem}
-        .problem-icon{color:var(--r);font-size:.68rem;letter-spacing:2px;margin-bottom:.8rem}
+        /* .problem-card::before supprimé, remplacé par .problem-ico */
+        .problem-ico{font-size:1.5rem;display:block;margin-bottom:.3rem;line-height:1;color:var(--r);text-align:left}
+        .problem-icon{color:var(--r);font-size:.95rem;font-weight:bold;letter-spacing:2px;margin-bottom:.5rem;display:block}
         .problem-title{color:#fff;font-size:.95rem;font-weight:bold;margin-bottom:.5rem}
         .problem-desc{color:var(--muted);font-size:.78rem;line-height:1.65}
         .what-wrap{background:rgba(13,20,16,.5);padding:5rem 0;margin-top:5rem}
@@ -187,12 +188,12 @@
     <h2 class="section-title fade-in">Multisig is secure. <span style="color:var(--r)">Your signing process isn't.</span></h2>
     <p class="section-sub fade-in">M-of-N cryptography protects your vault. But the moment you're asked to sign, the attack surface opens wide.</p>
     <div class="problems-grid">
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 01]</div><div class="problem-title">Address Poisoning</div><div class="problem-desc">Attackers inject lookalike addresses in transaction history. One paste, one signature, and your funds are gone — multisig won't stop it.</div></div>
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 02]</div><div class="problem-title">Blind Signing</div><div class="problem-desc">When signers can't decode raw calldata, they sign what they're told. Smart contract payloads hide malicious logic in plain sight.</div></div>
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 03]</div><div class="problem-title">Social Engineering</div><div class="problem-desc">Urgent Slack messages. Spoofed coordinators. Fake governance votes. Human signers under pressure are the weakest link in any threshold scheme.</div></div>
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 04]</div><div class="problem-title">Rogue Signer Collusion</div><div class="problem-desc">When m signers are simultaneously compromised, no threshold saves you. Anomalous co-signing patterns go undetected without behavioral AI.</div></div>
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 05]</div><div class="problem-title">Policy Drift</div><div class="problem-desc">Spending limits. Whitelist bypasses. Over months, wallets accumulate policy exceptions that silently undermine the original security model.</div></div>
-        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 06]</div><div class="problem-title">Cross-Chain Replay</div><div class="problem-desc">Signatures valid on one chain are replayed on another. Multi-chain deployments face replay vectors that human review routinely misses.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🧪</span><div class="problem-icon">Address Poisoning</div><div class="problem-desc">Attackers inject lookalike addresses in transaction history. One paste, one signature, and your funds are gone — multisig won't stop it.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🙈</span><div class="problem-icon">Blind Signing</div><div class="problem-desc">When signers can't decode raw calldata, they sign what they're told. Smart contract payloads hide malicious logic in plain sight.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🎭</span><div class="problem-icon">Social Engineering</div><div class="problem-desc">Urgent Slack messages. Spoofed coordinators. Fake governance votes. Human signers under pressure are the weakest link in any threshold scheme.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🤝</span><div class="problem-icon">Rogue Signer Collusion</div><div class="problem-desc">When m signers are simultaneously compromised, no threshold saves you. Anomalous co-signing patterns go undetected without behavioral AI.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🌀</span><div class="problem-icon">Policy Drift</div><div class="problem-desc">Spending limits. Whitelist bypasses. Over months, wallets accumulate policy exceptions that silently undermine the original security model.</div></div>
+        <div class="problem-card fade-in"><span class="problem-ico">🔁</span><div class="problem-icon">Cross-Chain Replay</div><div class="problem-desc">Signatures valid on one chain are replayed on another. Multi-chain deployments face replay vectors that human review routinely misses.</div></div>
     </div>
 </section>
 
