@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sig0x — AI Security Agent for Multisig</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --g:#00ff41;--r:#ff3131;--y:#ffbd2e;
+            --bg:#070b0a;--bg2:#0d1410;--bg3:#111915;
+            --txt:#c8ffd4;--muted:#4a6b52;--border:#1a2e1f
+        }
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--txt);font-family:'Courier New',Courier,monospace;overflow-x:hidden}
+        body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);pointer-events:none;z-index:9999}
+        nav{position:fixed;top:0;left:0;right:0;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(7,11,10,0.93);border-bottom:1px solid var(--border);backdrop-filter:blur(8px);z-index:100}
+        .logo{font-size:1.4rem;font-weight:bold;color:var(--g);letter-spacing:2px}
+        .logo span{color:var(--r)}
+        .nav-links{display:flex;gap:2rem}
+        .nav-links a{color:var(--muted);text-decoration:none;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;transition:color .2s}
+        .nav-links a:hover{color:var(--g)}
+        .nav-cta{background:transparent;border:1px solid var(--g);color:var(--g);padding:.4rem 1.2rem;font-family:inherit;font-size:.78rem;cursor:pointer;letter-spacing:1px;transition:all .2s}
+        .nav-cta:hover{background:var(--g);color:var(--bg)}
+        #hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+        .matrix-bg{position:absolute;inset:0;opacity:.08;z-index:0}
+        .hero-content{position:relative;z-index:1;max-width:820px}
+        .hero-badge{display:inline-block;border:1px solid var(--r);color:var(--r);font-size:.68rem;padding:.3rem .9rem;letter-spacing:2px;margin-bottom:2rem}
+        .hero-badge.rainbow-text {
+            background: linear-gradient(90deg, #ff0080, #8000ff, #00ffff, #00ff80, #ff8000);
+            background-size: 400% 400%;
+            animation: rainbow 4s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border: none;
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-title{font-size:clamp(1.8rem,5vw,3.6rem);font-weight:bold;color:#fff;line-height:1.18;margin-bottom:1.5rem;min-height:4.5rem}
+        #typewriter{display:inline-block;border-right:3px solid var(--g);padding-right:4px;animation:blink .7s step-end infinite;white-space:pre-line}
+        @keyframes blink{50%{border-color:transparent}}
+        .hero-sub{color:var(--muted);font-size:.92rem;margin-bottom:2.5rem;line-height:1.75;max-width:620px;margin-left:auto;margin-right:auto}
+        .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+        .btn-primary{background:var(--g);color:var(--bg);border:none;padding:.8rem 2rem;font-family:inherit;font-size:.82rem;letter-spacing:1px;cursor:pointer;font-weight:bold;transition:all .2s}
+        .btn-primary:hover{background:#00cc33;transform:translateY(-1px)}
+        .btn-secondary{background:transparent;color:var(--txt);border:1px solid var(--border);padding:.8rem 2rem;font-family:inherit;font-size:.82rem;letter-spacing:1px;cursor:pointer;transition:all .2s}
+        .btn-secondary:hover{border-color:var(--muted)}
+        .hero-stats{display:flex;gap:3rem;justify-content:center;margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
+        .stat{text-align:center}
+        .stat-num{color:var(--g);font-size:1.5rem;font-weight:bold}
+        .stat-label{color:var(--muted);font-size:.68rem;letter-spacing:1px;margin-top:.2rem}
+        section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+        .section-tag{color:var(--g);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:.8rem}
+        .section-title{font-size:clamp(1.4rem,3vw,2.1rem);color:#fff;margin-bottom:1rem;font-weight:bold}
+        .section-sub{color:var(--muted);font-size:.88rem;line-height:1.75;max-width:600px;margin-bottom:3rem}
+        .problems-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+        .problem-card{border:1px solid rgba(255,49,49,.28);padding:1.5rem;background:rgba(255,49,49,.03);position:relative;transition:all .3s}
+        .problem-card:hover{border-color:var(--r);background:rgba(255,49,49,.07)}
+        .problem-card::before{content:'//';position:absolute;top:1rem;right:1rem;color:rgba(255,49,49,.3);font-size:.78rem}
+        .problem-icon{color:var(--r);font-size:.68rem;letter-spacing:2px;margin-bottom:.8rem}
+        .problem-title{color:#fff;font-size:.95rem;font-weight:bold;margin-bottom:.5rem}
+        .problem-desc{color:var(--muted);font-size:.78rem;line-height:1.65}
+        .what-wrap{background:rgba(13,20,16,.5);padding:5rem 0;margin-top:5rem}
+        .terminal-window{background:#0a0e0b;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-top:2rem}
+        .terminal-bar{background:#111915;padding:.6rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border)}
+        .dot{width:10px;height:10px;border-radius:50%}
+        .dot.r{background:var(--r)}.dot.y{background:var(--y)}.dot.g{background:var(--g)}
+        .terminal-title{margin-left:.5rem;color:var(--muted);font-size:.72rem;flex:1;text-align:center}
+        .terminal-body{padding:1.5rem;font-size:.82rem;line-height:2}
+        .t-line{display:flex;gap:.5rem}
+        .t-prompt{color:var(--g);flex-shrink:0}
+        .t-cmd{color:#fff}
+        .t-out{color:var(--muted);padding-left:1rem}
+        .t-g{color:var(--g)}.t-r{color:var(--r)}.t-y{color:var(--y)}
+        .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:2rem}
+        .feature-item{padding:1.2rem;border:1px solid var(--border);background:rgba(0,255,65,.02);transition:border-color .2s}
+        .feature-item:hover{border-color:rgba(0,255,65,.3)}
+        .feature-label{color:var(--g);font-size:.68rem;letter-spacing:2px;margin-bottom:.5rem}
+        .feature-text{color:var(--txt);font-size:.8rem;line-height:1.55}
+        .how-steps{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:start;gap:1rem;margin-bottom:3rem}
+        .arrow-sep{color:var(--g);font-size:1.2rem;padding-top:1.5rem}
+        .step-box{border:1px solid var(--border);padding:1.5rem;text-align:center}
+        .step-num{color:var(--g);font-size:.68rem;letter-spacing:2px;margin-bottom:.8rem}
+        .step-title{color:#fff;font-size:.92rem;font-weight:bold;margin-bottom:.5rem}
+        .step-desc{color:var(--muted);font-size:.76rem;line-height:1.55}
+        .tx-sim{background:#060a07;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+        .tx-header{padding:.8rem 1.2rem;background:#0a0e0b;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+        .tx-header span{color:var(--g);font-size:.78rem;letter-spacing:1px}
+        .tx-status{font-size:.7rem;color:var(--muted)}
+        .tx-body{padding:1.5rem}
+        .tx-field{display:flex;justify-content:space-between;margin-bottom:.8rem;font-size:.8rem}
+        .tx-field-label{color:var(--muted);flex-shrink:0}
+        .tx-field-val{color:var(--txt);max-width:65%;text-align:right;word-break:break-all}
+        .tx-divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
+        .analysis-log{font-size:.76rem;line-height:2}
+        .log-line{display:flex;gap:.5rem;opacity:0;transition:opacity .3s}
+        .log-line.visible{opacity:1}
+        .verdict{margin-top:1rem;padding:1rem;text-align:center;font-size:.95rem;font-weight:bold;opacity:0;transition:opacity .5s}
+        .verdict.vg{color:var(--g);border:1px solid var(--g);background:rgba(0,255,65,.04)}
+        .verdict.vr{color:var(--r);border:1px solid var(--r);background:rgba(255,49,49,.04)}
+        .verdict.visible{opacity:1}
+        .sim-controls{display:flex;gap:1rem;padding:1rem 1.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
+        .sim-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.45rem 1.1rem;font-family:inherit;font-size:.75rem;cursor:pointer;transition:all .2s;letter-spacing:1px}
+        .sim-btn:hover,.sim-btn.active{border-color:var(--g);color:var(--g)}
+        .wallets-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+        .wallet-card{border:1px solid var(--border);padding:1.2rem;display:flex;align-items:center;gap:1rem;transition:all .2s}
+        .wallet-card:hover{border-color:rgba(0,255,65,.4);background:rgba(0,255,65,.02)}
+        .wallet-icon{width:36px;height:36px;background:rgba(0,255,65,.08);border:1px solid rgba(0,255,65,.2);display:flex;align-items:center;justify-content:center;color:var(--g);font-size:.68rem;font-weight:bold;flex-shrink:0}
+        .wallet-name{color:var(--txt);font-size:.83rem;font-weight:bold}
+        .wallet-type{color:var(--muted);font-size:.68rem;margin-top:.2rem}
+        .join-tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-bottom:2rem}
+        .track-card{border:1px solid var(--border);padding:1.5rem;cursor:pointer;transition:all .2s;position:relative}
+        .track-card:hover{border-color:rgba(0,255,65,.3)}
+        .track-card.selected{border-color:var(--g);background:rgba(0,255,65,.03)}
+        .track-card.selected::after{content:'✓ SELECTED';position:absolute;top:1rem;right:1rem;color:var(--g);font-size:.62rem;letter-spacing:1px}
+        .track-tag{color:var(--g);font-size:.62rem;letter-spacing:3px;margin-bottom:.8rem}
+        .track-title{color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:.5rem}
+        .track-desc{color:var(--muted);font-size:.78rem;line-height:1.6}
+        .join-form{max-width:520px}
+        .form-row{display:flex;gap:1rem;flex-wrap:wrap}
+        .form-input{background:transparent;border:1px solid var(--border);color:var(--txt);padding:.8rem 1rem;font-family:inherit;font-size:.83rem;flex:1;min-width:200px;outline:none;transition:border-color .2s}
+        .form-input:focus{border-color:var(--g)}
+        .form-input::placeholder{color:var(--muted)}
+        .form-note{color:var(--muted);font-size:.7rem;margin-top:.8rem}
+        .success-msg{display:none;color:var(--g);border:1px solid var(--g);padding:1rem;background:rgba(0,255,65,.04);font-size:.83rem;text-align:center;margin-top:1rem}
+        footer{border-top:1px solid var(--border);padding:2.5rem 2rem;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+        .footer-right{display:flex;gap:1.5rem;align-items:center}
+        .footer-right a{color:var(--muted);font-size:.7rem;text-decoration:none;transition:color .2s}
+        .footer-right a:hover{color:var(--g)}
+        .status-badge{display:flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.7rem}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:var(--y);animation:pulseY 2s ease infinite}
+        @keyframes pulseY{0%,100%{opacity:1}50%{opacity:.3}}
+        @keyframes glitch{0%,90%,100%{transform:none;text-shadow:none}92%{transform:translate(-2px,0);text-shadow:2px 0 var(--r)}94%{transform:translate(2px,0);text-shadow:-2px 0 var(--g)}96%{transform:translate(-1px,0);text-shadow:1px 0 var(--r)}}
+        .glitch{animation:glitch 4s infinite;display:inline-block}
+        .fade-in{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
+        .fade-in.visible{opacity:1;transform:none}
+        @media(max-width:700px){.nav-links{display:none}.how-steps{grid-template-columns:1fr}.arrow-sep{display:none}.hero-stats{gap:1.5rem}footer{flex-direction:column;text-align:center}.what-grid{grid-template-columns:1fr !important}}
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo glitch">Sig<span>0x</span></div>
+    <div class="nav-links">
+        <a href="#problems">Problem</a>
+        <a href="#what-sec">Solution</a>
+        <a href="#how">How it works</a>
+        <a href="#wallets">Wallets</a>
+        <a href="#join">Join</a>
+    </div>
+    <button class="nav-cta" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">Join waitlist</button>
+</nav>
+
+<section id="hero">
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    <div class="hero-content">
+        <div class="hero-badge rainbow-text">IN DEVELOPMENT — BETA COMING SOON</div>
+        <h1 class="hero-title"><span id="typewriter"></span></h1>
+        <p class="hero-sub">Sig0x is an AI security agent that analyzes every multisig transaction before you sign — detecting address poisoning, blind signing, social engineering, and protocol exploits in real time.</p>
+        <div class="hero-btns">
+            <button class="btn-primary" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">Join the Waitlist</button>
+            <button class="btn-secondary" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">See how it works →</button>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><div class="stat-num">$3B+</div><div class="stat-label">Lost to multisig exploits</div></div>
+            <div class="stat"><div class="stat-num">8</div><div class="stat-label">Compatible wallets</div></div>
+            <div class="stat"><div class="stat-num">12</div><div class="stat-label">Threat vectors analyzed</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="problems">
+    <div class="section-tag fade-in">// The problem</div>
+    <h2 class="section-title fade-in">Multisig is secure. <span style="color:var(--r)">Your signing process isn't.</span></h2>
+    <p class="section-sub fade-in">M-of-N cryptography protects your vault. But the moment you're asked to sign, the attack surface opens wide.</p>
+    <div class="problems-grid">
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 01]</div><div class="problem-title">Address Poisoning</div><div class="problem-desc">Attackers inject lookalike addresses in transaction history. One paste, one signature, and your funds are gone — multisig won't stop it.</div></div>
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 02]</div><div class="problem-title">Blind Signing</div><div class="problem-desc">When signers can't decode raw calldata, they sign what they're told. Smart contract payloads hide malicious logic in plain sight.</div></div>
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 03]</div><div class="problem-title">Social Engineering</div><div class="problem-desc">Urgent Slack messages. Spoofed coordinators. Fake governance votes. Human signers under pressure are the weakest link in any threshold scheme.</div></div>
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 04]</div><div class="problem-title">Rogue Signer Collusion</div><div class="problem-desc">When m signers are simultaneously compromised, no threshold saves you. Anomalous co-signing patterns go undetected without behavioral AI.</div></div>
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 05]</div><div class="problem-title">Policy Drift</div><div class="problem-desc">Spending limits. Whitelist bypasses. Over months, wallets accumulate policy exceptions that silently undermine the original security model.</div></div>
+        <div class="problem-card fade-in"><div class="problem-icon">[RED FLAG 06]</div><div class="problem-title">Cross-Chain Replay</div><div class="problem-desc">Signatures valid on one chain are replayed on another. Multi-chain deployments face replay vectors that human review routinely misses.</div></div>
+    </div>
+</section>
+
+<div class="what-wrap" id="what-sec">
+    <section style="max-width:1100px;margin:0 auto;padding:0 2rem;">
+        <div class="section-tag fade-in">// What is Sig0x</div>
+        <h2 class="section-title fade-in">An AI agent that <span style="color:var(--g)">reads every transaction</span> before you sign.</h2>
+        <p class="section-sub fade-in">Sig0x plugs into your existing multisig workflow and acts as an autonomous security reviewer — analyzing intent, context, risk vectors, and behavioral history before surfacing a signed verdict.</p>
+        <div class="what-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
+            <div class="terminal-window fade-in">
+                <div class="terminal-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="terminal-title">sig0x — transaction_review.agent</div></div>
+                <div class="terminal-body">
+                    <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> sig0x analyze --tx 0x4f2a...c831</span></div>
+                    <div class="t-line"><span class="t-out">Loading transaction context...</span></div>
+                    <div class="t-line"><span class="t-out">Recipient:  <span class="t-y">0xDeAd...bEeF</span></span></div>
+                    <div class="t-line"><span class="t-out">Amount:     2,450 ETH</span></div>
+                    <div class="t-line"><span class="t-out">Chain:      Ethereum Mainnet</span></div>
+                    <div class="t-line"><span class="t-out t-y">⚠ Address first seen 18h ago</span></div>
+                    <div class="t-line"><span class="t-out t-y">⚠ Pattern: address poison cluster</span></div>
+                    <div class="t-line"><span class="t-out t-r">✗ DELEGATE_CALL in calldata</span></div>
+                    <div class="t-line"><span class="t-out t-r">✗ RISK SCORE: 94/100 — DO NOT SIGN</span></div>
+                    <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"> _</span></div>
+                </div>
+            </div>
+            <div>
+                <div class="feature-grid">
+                    <div class="feature-item fade-in"><div class="feature-label">[01] CONTEXT</div><div class="feature-text">Cross-references recipient addresses against threat clusters, on-chain entity databases, and your wallet's historical patterns.</div></div>
+                    <div class="feature-item fade-in"><div class="feature-label">[02] DECODE</div><div class="feature-text">Decodes raw calldata into human-readable intent. Every function call explained — no more blind signing.</div></div>
+                    <div class="feature-item fade-in"><div class="feature-label">[03] REASON</div><div class="feature-text">Applies your policy rules, spending limits, and whitelist checks across 12 threat vectors with full chain context.</div></div>
+                    <div class="feature-item fade-in"><div class="feature-label">[04] VERDICT</div><div class="feature-text">Delivers a signed report with audit trail to each signer. Green light or red flag — with full breakdown and recommended action.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<section id="how">
+    <div class="section-tag fade-in">// How it works</div>
+    <h2 class="section-title fade-in">Three steps. <span style="color:var(--g)">One verdict.</span></h2>
+    <p class="section-sub fade-in">Sig0x fits your signing workflow without changing it. Propose, analyze, decide — fully informed.</p>
+    <div class="how-steps fade-in">
+        <div class="step-box"><div class="step-num">[STEP 01]</div><div class="step-title">Submit TX</div><div class="step-desc">A transaction is proposed in your multisig wallet. Sig0x intercepts it automatically — no manual step required.</div></div>
+        <div class="arrow-sep">—→</div>
+        <div class="step-box" style="border-color:rgba(255,189,46,.35);background:rgba(255,189,46,.02)"><div class="step-num" style="color:var(--y)">[STEP 02]</div><div class="step-title">Sig0x Analyzes</div><div class="step-desc">The AI agent decodes calldata, checks recipient reputation, validates policy rules, and scores risk across 12 threat vectors.</div></div>
+        <div class="arrow-sep">—→</div>
+        <div class="step-box"><div class="step-num">[STEP 03]</div><div class="step-title">Verdict Delivered</div><div class="step-desc">Each signer receives a full security report. Green light to proceed, or a red flag with detailed explanation and recommended action.</div></div>
+    </div>
+
+    <div class="tx-sim fade-in">
+        <div class="tx-header"><span>// Interactive TX simulation</span><span class="tx-status" id="simStatus">Select a scenario below</span></div>
+        <div class="tx-body">
+            <div class="tx-field"><span class="tx-field-label">From</span><span class="tx-field-val">Safe{Wallet} — 3-of-5 multisig</span></div>
+            <div class="tx-field"><span class="tx-field-label">To</span><span class="tx-field-val" id="simTo">—</span></div>
+            <div class="tx-field"><span class="tx-field-label">Value</span><span class="tx-field-val" id="simVal">—</span></div>
+            <div class="tx-field"><span class="tx-field-label">Calldata</span><span class="tx-field-val" id="simData" style="font-size:.72rem;color:var(--muted)">—</span></div>
+            <hr class="tx-divider">
+            <div class="analysis-log" id="log"></div>
+            <div class="verdict" id="verdict"></div>
+        </div>
+        <div class="sim-controls">
+            <button class="sim-btn" id="btnSafe" onclick="runSim('safe')">Scenario A — Safe transfer</button>
+            <button class="sim-btn" id="btnBad" onclick="runSim('bad')">Scenario B — Poisoned TX</button>
+            <button class="sim-btn" onclick="resetSim()">Reset</button>
+        </div>
+    </div>
+</section>
+
+<section id="wallets">
+    <div class="section-tag fade-in">// Compatible wallets</div>
+    <h2 class="section-title fade-in">Works with your current setup.</h2>
+    <p class="section-sub fade-in">Sig0x integrates with the leading multisig platforms — no migration, no custody changes. Plug in and protect.</p>
+    <div class="wallets-grid">
+        <div class="wallet-card fade-in"><div class="wallet-icon">SF</div><div><div class="wallet-name">Safe{Wallet}</div><div class="wallet-type">EVM smart contract</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">BG</div><div><div class="wallet-name">BitGo</div><div class="wallet-type">Institutional custody</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">CS</div><div><div class="wallet-name">Casa</div><div class="wallet-type">Key agent model</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">UC</div><div><div class="wallet-name">Unchained Capital</div><div class="wallet-type">Collaborative custody</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">NK</div><div><div class="wallet-name">Nunchuk</div><div class="wallet-type">Bitcoin multisig</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">TS</div><div><div class="wallet-name">TotalSig</div><div class="wallet-type">Multi-chain vault</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">EL</div><div><div class="wallet-name">Electrum</div><div class="wallet-type">Bitcoin desktop</div></div></div>
+        <div class="wallet-card fade-in"><div class="wallet-icon">AR</div><div><div class="wallet-name">Armory</div><div class="wallet-type">Cold storage</div></div></div>
+    </div>
+</section>
+
+<section id="join">
+    <div class="section-tag fade-in">// Get early access</div>
+    <h2 class="section-title fade-in">Join the <span style="color:var(--g)">Sig0x list.</span></h2>
+    <p class="section-sub fade-in">Select your track and drop your email. Early users, beta testers, and investors are handled on separate priority queues.</p>
+    <div class="join-tracks">
+        <div class="track-card fade-in" id="track-user" onclick="selectTrack('user')"><div class="track-tag">[TRACK 01]</div><div class="track-title">Early User</div><div class="track-desc">You manage a multisig wallet and want to be among the first to protect it with Sig0x when we ship.</div></div>
+        <div class="track-card fade-in" id="track-beta" onclick="selectTrack('beta')"><div class="track-tag">[TRACK 02]</div><div class="track-title">Beta Tester</div><div class="track-desc">You're ready to test pre-release builds, report issues, and help shape the product before public launch.</div></div>
+        <div class="track-card fade-in" id="track-investor" onclick="selectTrack('investor')"><div class="track-tag">[TRACK 03]</div><div class="track-title">Investor</div><div class="track-desc">You invest in early-stage crypto security infrastructure and want to discuss the Sig0x funding round.</div></div>
+    </div>
+    <div class="join-form fade-in">
+        <div class="form-row">
+            <input type="email" class="form-input" id="emailInput" placeholder="your@email.com" />
+            <button class="btn-primary" onclick="submitForm()">Request access →</button>
+        </div>
+        <p class="form-note">// No spam. No third-party sharing. We'll reach out based on your selected track.</p>
+        <div class="success-msg" id="successMsg">
+            <span style="color:var(--g)">✓ ACCESS_REQUESTED</span><br>
+            <span style="color:var(--muted);font-size:.78rem;display:block;margin-top:.4rem">You're on the list. We'll be in touch.</span>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div>
+        <div class="logo">Sig<span style="color:var(--r)">0x</span></div>
+        <p style="color:var(--muted);font-size:.7rem;margin-top:.3rem">AI security agent for multisig transactions.</p>
+        <p style="color:var(--muted);font-size:.7rem;margin-top:.2rem">© <span id="year"></span> Sig0x. All rights reserved.</p>
+    </div>
+    <div class="footer-right">
+        <div class="status-badge"><div class="status-dot"></div>In development</div>
+        <a href="#">Privacy</a>
+        <a href="#">Contact</a>
+    </div>
+</footer>
+
+<script>
+    const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+    function resizeC(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight}
+    resizeC();window.addEventListener('resize',resizeC);
+    const cols=Math.floor(canvas.width/16),drops=Array(cols).fill(1);
+    const chars='01アイウエカキクサシスタチナニ{}[]<>/\\=+-*@!#$%';
+    function drawM(){
+        ctx.fillStyle='rgba(7,11,10,0.05)';ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='#00ff41';ctx.font='13px Courier New';
+        drops.forEach((y,i)=>{
+            ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,y*16);
+            if(y*16>canvas.height&&Math.random()>.975)drops[i]=0;
+            drops[i]++;
+        });
+    }
+    setInterval(drawM,55);
+
+    const phrases=["Don't sign blind.","Verify before you sign.","Your AI security layer\nfor multisig.","Zero blind spots.\nEvery transaction."];
+    let pi=0,ci=0,del=false;
+    const tw=document.getElementById('typewriter');
+    function type(){
+        const p=phrases[pi];
+        if(!del){tw.textContent=p.slice(0,ci+1);ci++;if(ci===p.length){del=true;setTimeout(type,2200);return}}
+        else{tw.textContent=p.slice(0,ci-1);ci--;if(ci===0){del=false;pi=(pi+1)%phrases.length}}
+        setTimeout(type,del?38:85);
+    }
+    type();
+
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});
+    document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
+
+    let running=false;
+    const SC={
+        safe:{to:'0xA9B1c4D2...4C2D — Coinbase Prime (verified)',val:'12.5 ETH (~$38,750)',data:'0x — plain transfer',
+            logs:[
+                {t:'Resolving recipient identity...',c:'t-out',d:400},
+                {t:'✓ Entity: Coinbase Prime — verified CEX',c:'t-g',d:900},
+                {t:'Checking address age & activity...',c:'t-out',d:1400},
+                {t:'✓ Address active since 2021 — 1,842 transactions',c:'t-g',d:1900},
+                {t:'Validating spending policy...',c:'t-out',d:2400},
+                {t:'✓ Amount within approved daily limit',c:'t-g',d:2900},
+                {t:'Scanning calldata for hidden calls...',c:'t-out',d:3400},
+                {t:'✓ Plain ETH transfer — no contract interaction',c:'t-g',d:3900},
+                {t:'Computing risk score...',c:'t-out',d:4500},
+            ],verdict:{t:'✓ CLEAR TO SIGN — Risk score: 4 / 100',cls:'vg',d:5300}},
+        bad:{to:'0xDeAdBeEf...bEeF — unknown entity',val:'2,450 ETH (~$7,595,000)',data:'0x23b872dd...f8 (DELEGATE_CALL)',
+            logs:[
+                {t:'Resolving recipient identity...',c:'t-out',d:400},
+                {t:'⚠ Unknown address — no entity match found',c:'t-y',d:900},
+                {t:'Checking address age & cluster...',c:'t-out',d:1400},
+                {t:'✗ First seen 18h ago — freshly generated wallet',c:'t-r',d:1900},
+                {t:'✗ Pattern match: address poison cluster (94% confidence)',c:'t-r',d:2400},
+                {t:'Decoding calldata...',c:'t-out',d:2900},
+                {t:'✗ DELEGATE_CALL detected — arbitrary execution risk',c:'t-r',d:3400},
+                {t:'✗ Amount equals 91% of total vault balance — anomalous',c:'t-r',d:3900},
+                {t:'Computing risk score...',c:'t-out',d:4500},
+            ],verdict:{t:'✗ DO NOT SIGN — Risk score: 94 / 100',cls:'vr',d:5300}}
+    };
+    function resetSim(){
+        running=false;
+        ['simTo','simVal'].forEach(id=>document.getElementById(id).textContent='—');
+        document.getElementById('simData').textContent='—';
+        document.getElementById('log').innerHTML='';
+        const v=document.getElementById('verdict');v.textContent='';v.className='verdict';
+        document.getElementById('simStatus').textContent='Select a scenario below';
+        document.querySelectorAll('.sim-btn').forEach(b=>b.classList.remove('active'));
+    }
+    function runSim(type){
+        if(running)return;running=true;
+        resetSim();running=true;
+        const s=SC[type];
+        document.getElementById('simTo').textContent=s.to;
+        document.getElementById('simVal').textContent=s.val;
+        document.getElementById('simData').textContent=s.data;
+        document.getElementById('simStatus').textContent='Analyzing...';
+        document.getElementById(type==='safe'?'btnSafe':'btnBad').classList.add('active');
+        const log=document.getElementById('log');
+        s.logs.forEach(l=>{
+            setTimeout(()=>{
+                const d=document.createElement('div');d.className='log-line';
+                d.innerHTML=`<span class="t-prompt">›</span><span class="${l.c}">${l.t}</span>`;
+                log.appendChild(d);requestAnimationFrame(()=>d.classList.add('visible'));
+            },l.d);
+        });
+        setTimeout(()=>{
+            const v=document.getElementById('verdict');
+            v.textContent=s.verdict.t;v.className='verdict '+s.verdict.cls;
+            requestAnimationFrame(()=>v.classList.add('visible'));
+            document.getElementById('simStatus').textContent='Analysis complete';
+        },s.verdict.d);
+    }
+
+    let selTrack=null;
+    const waitlist=[];
+    function selectTrack(t){
+        selTrack=t;
+        document.querySelectorAll('.track-card').forEach(c=>c.classList.remove('selected'));
+        document.getElementById('track-'+t).classList.add('selected');
+    }
+    function submitForm(){
+        const e=document.getElementById('emailInput'),v=e.value.trim();
+        if(!v||!v.includes('@')){e.style.borderColor='var(--r)';return}
+        waitlist.push({email:v,track:selTrack||'general',ts:Date.now()});
+        document.getElementById('successMsg').style.display='block';
+        e.value='';e.style.borderColor='';
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
